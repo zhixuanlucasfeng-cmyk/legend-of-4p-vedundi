@@ -35,8 +35,44 @@ function renderChapterText(text) {
 }
 
 function renderTOC() {
-  // filled in by Task 7
+  const nav = document.getElementById('toc-list');
+  nav.innerHTML = '';
+  state.chapters.forEach((chapter) => {
+    const a = document.createElement('a');
+    a.href = `#${chapter.slug}`;
+    a.textContent = chapterTitle(chapter);
+    a.className = 'block px-4 py-3 rounded-lg text-sm mx-2 mb-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5';
+    if (chapter.slug === state.currentSlug) {
+      a.classList.add('bg-black/5', 'dark:bg-white/10', 'font-semibold');
+    }
+    a.addEventListener('click', () => {
+      if (window.innerWidth < 768) setSidebarOpen(false);
+    });
+    nav.appendChild(a);
+  });
 }
+
+let sidebarOpen = true;
+
+function setSidebarOpen(open) {
+  sidebarOpen = open;
+  const sidebar = document.getElementById('sidebar');
+  const pane = document.getElementById('content-pane');
+  const backdrop = document.getElementById('drawer-backdrop');
+
+  sidebar.classList.toggle('-translate-x-full', !open);
+  sidebar.classList.toggle('md:w-64', open);
+  sidebar.classList.toggle('md:w-0', !open);
+  sidebar.classList.toggle('md:border-r-0', !open);
+
+  pane.classList.toggle('md:ml-64', open);
+  pane.classList.toggle('md:ml-0', !open);
+
+  backdrop.classList.toggle('hidden', !(open && window.innerWidth < 768));
+}
+
+document.getElementById('sidebar-toggle').addEventListener('click', () => setSidebarOpen(!sidebarOpen));
+document.getElementById('drawer-backdrop').addEventListener('click', () => setSidebarOpen(false));
 
 function getSlugFromHash() {
   const raw = decodeURIComponent(location.hash.replace('#', ''));
@@ -83,6 +119,7 @@ document.getElementById('lang-toggle').addEventListener('click', async () => {
 async function init() {
   applyTheme(currentTheme());
   document.getElementById('lang-toggle').textContent = state.lang === 'en' ? '中' : 'EN';
+  setSidebarOpen(window.innerWidth >= 768);
   await loadChapters();
   await navigateTo(getSlugFromHash());
   window.addEventListener('hashchange', () => navigateTo(getSlugFromHash()));
