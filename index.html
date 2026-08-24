@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+(function () {
+  var stored = localStorage.getItem('reader-theme');
+  var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>The Legend of 4P Vedundi · 四个P的传说</title>
+<link rel="stylesheet" href="dist/styles.css">
+</head>
+<body class="bg-paper dark:bg-paper-dark text-ink dark:text-ink-dark font-serif antialiased transition-colors duration-300">
+
+  <div id="progress-bar" class="fixed top-0 left-0 h-0.5 bg-accent dark:bg-accent-dark z-50" style="width:0%"></div>
+
+  <header class="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-2 border-b border-ink/10 dark:border-ink-dark/10 bg-paper/90 dark:bg-paper-dark/90 backdrop-blur z-40">
+    <button id="sidebar-toggle" aria-label="Toggle table of contents" class="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5">
+      <span class="text-xl">&#9776;</span>
+    </button>
+    <h1 id="chapter-title" class="text-sm md:text-base font-medium truncate px-2"></h1>
+    <div class="flex items-center gap-1">
+      <button id="lang-toggle" class="w-11 h-11 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">中</button>
+      <button id="theme-toggle" aria-label="Toggle dark mode" class="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5">
+        <span id="theme-icon">&#127769;</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="drawer-backdrop" class="hidden fixed inset-0 bg-black/30 z-30 md:hidden"></div>
+
+  <aside id="sidebar" class="fixed top-14 left-0 bottom-0 overflow-hidden -translate-x-full md:translate-x-0 md:w-64 transition-all duration-300 border-r border-ink/10 dark:border-ink-dark/10 bg-paper dark:bg-paper-dark z-40">
+    <nav id="toc-list" class="w-64 py-4 h-full overflow-y-auto"></nav>
+  </aside>
+
+  <main id="content-pane" class="pt-14 md:ml-64 h-screen overflow-y-auto paper-texture transition-[margin] duration-300">
+    <div class="max-w-[65ch] mx-auto px-6 py-12">
+      <div id="chapter-content" class="leading-[1.75] text-[1.05rem] transition-opacity duration-200"></div>
+    </div>
+  </main>
+
+  <script src="src/app.js" defer></script>
+</body>
+</html>
