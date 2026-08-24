@@ -1,0 +1,7 @@
+This is placeholder text standing in for Chapter One of The Legend of 4P Vedundi, until the author's real manuscript is dropped into this file.
+
+It exists only to prove the reading experience end to end: the serif typography, the 65-character column width, the generous line height, and the paragraph-by-paragraph fade-in as you scroll.
+
+Replace the contents of this file with the real chapter text when it's ready. Paragraphs are separated by a single blank line, exactly like this one.
+
+No markdown, no HTML — just plain paragraphs, the way a manuscript reads.

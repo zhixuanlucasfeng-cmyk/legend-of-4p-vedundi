@@ -1,0 +1,5 @@
+This is placeholder text for Chapter Two.
+
+Navigating here from Chapter One should feel like turning a page: the old chapter fades out, this one fades in, and the reading progress bar at the top resets to the beginning.
+
+Once the real second chapter is ready, this file is where it goes.
