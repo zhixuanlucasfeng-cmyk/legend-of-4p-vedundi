@@ -8,6 +8,42 @@ const state = {
 
 const contentPane = document.getElementById('content-pane');
 
+let revealObserver = null;
+
+function observeReveals() {
+  if (revealObserver) revealObserver.disconnect();
+  revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { root: contentPane, threshold: 0.1 }
+  );
+  document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+}
+
+let progressTicking = false;
+
+function updateProgressBar() {
+  const max = contentPane.scrollHeight - contentPane.clientHeight;
+  const pct = max > 0 ? Math.min(100, (contentPane.scrollTop / max) * 100) : 0;
+  document.getElementById('progress-bar').style.width = `${pct}%`;
+}
+
+contentPane.addEventListener('scroll', () => {
+  if (!progressTicking) {
+    requestAnimationFrame(() => {
+      updateProgressBar();
+      progressTicking = false;
+    });
+    progressTicking = true;
+  }
+});
+
 function chapterTitle(chapter) {
   return state.lang === 'zh' ? chapter.titleZh : chapter.titleEn;
 }
@@ -32,6 +68,7 @@ function renderChapterText(text) {
     el.textContent = p;
     container.appendChild(el);
   });
+  observeReveals();
 }
 
 function renderTOC() {
@@ -95,6 +132,7 @@ async function navigateTo(slug) {
   renderChapterText(text);
   document.getElementById('chapter-title').textContent = chapterTitle(chapter);
   contentPane.scrollTop = 0;
+  updateProgressBar();
   renderTOC();
 
   contentEl.classList.remove('opacity-0');
