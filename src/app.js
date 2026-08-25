@@ -23,7 +23,10 @@ function observeReveals() {
     },
     { root: contentPane, threshold: 0.1 }
   );
-  document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+  document
+    .getElementById('chapter-content')
+    .querySelectorAll('.reveal')
+    .forEach((el) => revealObserver.observe(el));
 }
 
 let progressTicking = false;
@@ -123,24 +126,38 @@ async function navigateTo(slug) {
 
   const contentEl = document.getElementById('chapter-content');
   contentEl.classList.add('opacity-0');
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
-  const res = await fetch(`content/${state.lang}/${slug}.txt`);
-  const text = await res.text();
+    let text;
+    try {
+      const res = await fetch(`content/${state.lang}/${slug}.txt`);
+      if (!res.ok) throw new Error(`Failed to load chapter (${res.status})`);
+      text = await res.text();
+    } catch (err) {
+      text = 'Sorry, this chapter could not be loaded. Please try again later.';
+    }
 
-  state.currentSlug = slug;
-  renderChapterText(text);
-  document.getElementById('chapter-title').textContent = chapterTitle(chapter);
-  contentPane.scrollTop = 0;
-  updateProgressBar();
-  renderTOC();
-
-  contentEl.classList.remove('opacity-0');
+    state.currentSlug = slug;
+    renderChapterText(text);
+    document.getElementById('chapter-title').textContent = chapterTitle(chapter);
+    contentPane.scrollTop = 0;
+    updateProgressBar();
+    renderTOC();
+  } finally {
+    contentEl.classList.remove('opacity-0');
+  }
 }
 
 async function loadChapters() {
-  const res = await fetch('chapters.json');
-  state.chapters = await res.json();
+  try {
+    const res = await fetch('chapters.json');
+    if (!res.ok) throw new Error(`Failed to load chapters (${res.status})`);
+    state.chapters = await res.json();
+  } catch (err) {
+    const target = document.getElementById('chapter-content') || document.getElementById('content-pane');
+    target.textContent = 'Sorry, this site failed to load. Please try refreshing the page.';
+  }
 }
 
 document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -150,13 +167,13 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 document.getElementById('lang-toggle').addEventListener('click', async () => {
   state.lang = state.lang === 'en' ? 'zh' : 'en';
   localStorage.setItem(STORAGE_KEYS.lang, state.lang);
-  document.getElementById('lang-toggle').textContent = state.lang === 'en' ? '中' : 'EN';
+  document.documentElement.lang = state.lang === 'zh' ? 'zh' : 'en';
   await navigateTo(state.currentSlug);
 });
 
 async function init() {
   applyTheme(currentTheme());
-  document.getElementById('lang-toggle').textContent = state.lang === 'en' ? '中' : 'EN';
+  document.documentElement.lang = state.lang === 'zh' ? 'zh' : 'en';
   setSidebarOpen(window.innerWidth >= 768);
   await loadChapters();
   await navigateTo(getSlugFromHash());

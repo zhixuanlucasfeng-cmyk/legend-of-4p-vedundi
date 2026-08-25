@@ -2,11 +2,6 @@
 module.exports = {
   content: ['./index.html', './src/**/*.js'],
   darkMode: 'class',
-  safelist: [
-    'paper-texture',
-    'reveal',
-    'reveal.is-visible',
-  ],
   theme: {
     extend: {
       colors: {
