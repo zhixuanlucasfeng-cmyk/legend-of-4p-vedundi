@@ -148,6 +148,8 @@ function renderHome() {
 }
 
 async function navigateTo(slug) {
+  if (!state.chapters.length) return;
+
   const contentEl = document.getElementById('chapter-content');
   contentEl.classList.add('opacity-0');
   try {
