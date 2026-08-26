@@ -116,18 +116,55 @@ document.getElementById('drawer-backdrop').addEventListener('click', () => setSi
 
 function getSlugFromHash() {
   const raw = decodeURIComponent(location.hash.replace('#', ''));
+  if (!raw) return null;
   const found = state.chapters.find((c) => c.slug === raw);
-  return found ? raw : state.chapters[0] && state.chapters[0].slug;
+  return found ? raw : null;
+}
+
+function bookTitle() {
+  return state.lang === 'zh' ? '四个P的传说' : 'The Legend of 4P Vedundi';
+}
+
+function renderHome() {
+  const container = document.getElementById('chapter-content');
+  container.innerHTML = '';
+
+  const cover = document.createElement('img');
+  cover.src = 'covers/season-01.jpg';
+  cover.alt = state.lang === 'zh' ? 'Legendary of Four P：第一季封面' : 'Legendary of Four P: Season One cover';
+  cover.className = 'w-full max-w-sm mx-auto rounded-lg shadow-lg mb-10';
+  container.appendChild(cover);
+
+  const list = document.createElement('nav');
+  list.className = 'space-y-2';
+  state.chapters.forEach((chapter) => {
+    const a = document.createElement('a');
+    a.href = `#${chapter.slug}`;
+    a.textContent = chapterTitle(chapter);
+    a.className = 'block px-4 py-3 rounded-lg border border-ink/10 dark:border-ink-dark/10 hover:bg-black/5 dark:hover:bg-white/5 transition-colors';
+    list.appendChild(a);
+  });
+  container.appendChild(list);
 }
 
 async function navigateTo(slug) {
-  const chapter = state.chapters.find((c) => c.slug === slug);
-  if (!chapter) return;
-
   const contentEl = document.getElementById('chapter-content');
   contentEl.classList.add('opacity-0');
   try {
     await new Promise((resolve) => setTimeout(resolve, 200));
+
+    if (!slug) {
+      state.currentSlug = null;
+      renderHome();
+      document.getElementById('chapter-title').textContent = bookTitle();
+      contentPane.scrollTop = 0;
+      updateProgressBar();
+      renderTOC();
+      return;
+    }
+
+    const chapter = state.chapters.find((c) => c.slug === slug);
+    if (!chapter) return;
 
     let text;
     try {
